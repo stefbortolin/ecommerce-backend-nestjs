@@ -4,21 +4,17 @@ import { AppService } from './app.service';
 import { ProductModule } from './product/product.module';
 import { CategoryModule } from './category/category.module';
 import { UserModule } from './user/user.module';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
+import { DataSourceConfig } from './config/data.source';
+console.log(process.env.NODE_ENV)
 @Module({
-  imports: [TypeOrmModule.forRoot({
-    type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: '1111',
-    database: 'db_ecommerce',
-    entities: ['dist/**/*.entity{.ts,.js}'],
-    synchronize: false,
-    retryDelay:3000,
-    retryAttempts:10,
-  }),ProductModule, CategoryModule, UserModule],
+  imports: [ConfigModule.forRoot({
+    envFilePath: `.${process.env.NODE_ENV}.env`,
+    isGlobal: true
+  }),
+  TypeOrmModule.forRoot({...DataSourceConfig}),
+  ProductModule, CategoryModule, UserModule],
   controllers: [AppController],
   providers: [AppService],
 })

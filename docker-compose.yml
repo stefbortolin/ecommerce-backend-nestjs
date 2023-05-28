@@ -1,13 +1,15 @@
-version: '3.3'
+version: '3.1'
 
 services:
-  database:
-    image: postgres:13
+  ecommerce_pg:
+    image: postgres:15.3
+    container_name: ecommerce_pg
+    restart: always
     environment:
-      - POSTGRES_DB=db_ecommerce
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=1111
-    ports:
-      - '5432:5432'
+      POSTGRES_DB: ecommercedb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1111
     volumes:
-      - ./postgres_data:/var/lib/postgresql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 5432:5432

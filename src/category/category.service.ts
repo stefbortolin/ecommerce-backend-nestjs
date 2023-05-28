@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './entities/category.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { ErrorManager } from '../utils/error.manager';
 
 
 @Injectable()
@@ -12,24 +12,79 @@ export class CategoryService {
 
   }
 
-  create(category: CreateCategoryDto) {
-    const newCategory = this.categoryRepository.create(category)
-    return this.categoryRepository.save(newCategory)
+  public async create(category: CreateCategoryDto): Promise<Category> {
+    try {
+      const newCategory = this.categoryRepository.create(category)
+      return await this.categoryRepository.save(newCategory)
+    } catch (error) {
+      throw new ErrorManager.createSignatureError(error.message)
+    }
+
   }
 
-  findAll() {
-    return this.categoryRepository.find()
+  public async findAll(): Promise<Category[]> {
+    try {
+      const categories: Category[] = await this.categoryRepository.find()
+      if ( categories.length === 0){
+        throw new ErrorManager({
+          type:'BAD_REQUEST',
+          message: 'No se encontro resultado'
+        })
+      }
+      return categories
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message)
+    }
+
   }
 
-  findOne(id: number) {
-    return this.categoryRepository.findOneById(id)
+  public async findOne(id: string): Promise<Category> {
+    try {
+      const category: Category = await this.categoryRepository.
+      createQueryBuilder('category')
+      .where({id})
+      .getOne()
+      
+      if (!category){
+        throw new ErrorManager({
+          type:'BAD_REQUEST',
+          message: 'No se encontro resultado'
+        })
+      }
+
+      return category
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message)
+    }
   }
 
-  update(id: number, updatedCategory: UpdateCategoryDto) {
-    this.categoryRepository.update({id}, updatedCategory)
+  public async update(id: string, updatedCategory: UpdateCategoryDto): Promise<UpdateResult | undefined>  {
+    try {
+      const user: UpdateResult = await this.categoryRepository.update(id, updatedCategory)
+      if (user.affected == 0 ){
+        throw new ErrorManager({
+          type:'BAD_REQUEST',
+          message: 'No se pudo actualizar'
+        })
+      }
+      return user
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message)
+    }
   }
 
-  remove(id: number) {
-    return this.categoryRepository.delete({id})
+  public async remove(id: string): Promise<DeleteResult | undefined>  {
+    try {
+      const user: DeleteResult = await this.categoryRepository.delete(id)
+      if (user.affected == 0 ){
+        throw new ErrorManager({
+          type:'BAD_REQUEST',
+          message: 'No se pudo borrar'
+        })
+      }
+      return user
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message)
+    }
   }
 }

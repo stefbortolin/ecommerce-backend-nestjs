@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { CategoryService } from './category.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import { Category } from './entities/category.entity';
 
 @Controller('category')
@@ -9,27 +8,29 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  create(@Body() newCategory: CreateCategoryDto) {
-    return this.categoryService.create(newCategory);
+  public async create(@Body() newCategory: CreateCategoryDto) {
+    return await this.categoryService.create(newCategory);
   }
 
   @Get()
-  findAll(): Promise<Category[]> {
-    return this.categoryService.findAll();
+  public async findAll(): Promise<Category[]> {
+    return await this.categoryService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Category> {
-    return this.categoryService.findOne(+id);
+  public async findOne(@Param('id') id: string): Promise<Category> {
+    return await this.categoryService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() updatedCategory: UpdateCategoryDto) {
-    return this.categoryService.update(+id, updatedCategory);
+  public async update(
+    @Param('id') id: string, 
+    @Body() updatedCategory: UpdateCategoryDto) {
+    return await this.categoryService.update(id, updatedCategory);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: string) {
-    return this.categoryService.remove(+id);
+  public async remove(@Param('id') id: string) {
+    return await this.categoryService.remove(id);
   }
 }
