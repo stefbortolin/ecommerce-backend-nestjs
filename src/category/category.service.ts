@@ -19,7 +19,6 @@ export class CategoryService {
     } catch (error) {
       throw new ErrorManager.createSignatureError(error.message)
     }
-
   }
 
   public async findAll(): Promise<Category[]> {
@@ -60,14 +59,14 @@ export class CategoryService {
 
   public async update(id: string, updatedCategory: UpdateCategoryDto): Promise<UpdateResult | undefined>  {
     try {
-      const user: UpdateResult = await this.categoryRepository.update(id, updatedCategory)
-      if (user.affected == 0 ){
+      const category: UpdateResult = await this.categoryRepository.update(id, updatedCategory)
+      if (category.affected == 0 ){
         throw new ErrorManager({
           type:'BAD_REQUEST',
           message: 'No se pudo actualizar'
         })
       }
-      return user
+      return category
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message)
     }
@@ -75,14 +74,14 @@ export class CategoryService {
 
   public async remove(id: string): Promise<DeleteResult | undefined>  {
     try {
-      const user: DeleteResult = await this.categoryRepository.delete(id)
-      if (user.affected == 0 ){
+      const category: DeleteResult = await this.categoryRepository.delete(id)
+      if (category.affected == 0 ){
         throw new ErrorManager({
           type:'BAD_REQUEST',
           message: 'No se pudo borrar'
         })
       }
-      return user
+      return category
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message)
     }
