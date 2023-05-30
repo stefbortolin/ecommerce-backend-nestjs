@@ -1,3 +1,4 @@
+import { Exclude } from "class-transformer"
 import { BaseEntity } from "../../config/base.entity"
 import { UserRole } from "../../constants/roles"
 import { Product } from "../../product/entities/product.entity"
@@ -7,6 +8,8 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 export class User extends BaseEntity{
     @Column({unique: true})
     username: string
+
+    @Exclude()
     @Column()
     password: string
     @Column({

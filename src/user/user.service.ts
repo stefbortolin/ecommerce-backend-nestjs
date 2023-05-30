@@ -4,6 +4,7 @@ import { User } from './entities/user.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ErrorManager } from '../utils/error.manager';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -13,8 +14,8 @@ export class UserService {
   }
   public async create(user: CreateUserDto): Promise<User> {
     try {
-      const newUser = this.userRepository.create(user)
-      return await this.userRepository.save(newUser)
+      user.password = await bcrypt.hash(user.password, process.env.HASH_SALT)
+      return await this.userRepository.save(user)
     } catch (error) {
       throw new ErrorManager.createSignatureError(error.message)
     }
@@ -35,7 +36,7 @@ export class UserService {
     }
   }
 
-    public async findOne(id: string): Promise<User> {
+  public async findOne(id: string): Promise<User> {
     try {
       const user: User = await this.userRepository.
       createQueryBuilder('user')
@@ -50,6 +51,20 @@ export class UserService {
         })
       }
 
+      return user
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message)
+    }
+  }
+
+  public async findBy({key,value}:{
+    key: keyof CreateUserDto
+    value: any
+  }){
+    try {
+      const user: User = await this.userRepository.createQueryBuilder(
+        'user',
+        ).addSelect('user.password').where({[key]:value}).getOne();
       return user
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message)
