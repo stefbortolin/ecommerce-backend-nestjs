@@ -8,7 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSourceConfig } from './config/data.source';
 import { AuthModule } from './auth/auth.module';
-console.log(process.env.NODE_ENV)
+
 @Module({
   imports: [ConfigModule.forRoot({
     envFilePath: `.${process.env.NODE_ENV}.env`,

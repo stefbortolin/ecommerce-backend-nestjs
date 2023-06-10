@@ -4,9 +4,12 @@ import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 import { PublicAccess } from '../auth/decorators/public.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { AdminAccess } from '../auth/decorators/admin.decorator';
 
 @Controller('user')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -15,10 +18,11 @@ export class UserController {
     return await this.userService.create(newUser);
   }
 
+  @AdminAccess()
   @Get()
   public async findAll(): Promise<User[]> {
     return await this.userService.findAll();
-  }
+  } 
 
   @PublicAccess()
   @Get(':id')
